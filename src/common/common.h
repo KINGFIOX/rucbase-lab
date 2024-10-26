@@ -14,7 +14,6 @@ See the Mulan PSL v2 for more details. */
 #include <cstring>
 #include <memory>
 #include <string>
-#include <vector>
 
 #include "defs.h"
 #include "record/rm_defs.h"
@@ -23,6 +22,9 @@ struct TabCol {
   std::string tab_name;
   std::string col_name;
 
+  /// overload < for TabCol
+  ///
+  /// #[derived(Ord)] in Rust
   friend bool operator<(const TabCol &x, const TabCol &y) { return std::make_pair(x.tab_name, x.col_name) < std::make_pair(y.tab_name, y.col_name); }
 };
 

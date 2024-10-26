@@ -2,22 +2,26 @@
 %option caseless
     /* we don't need yywrap() function */
 %option noyywrap
-    /* we don't need yyunput() function */
+    /* we don't need yyunput() function, always be used to handle multi files */
 %option nounput
-    /* we don't need input() function */
+    /* we don't need input() function, unsed to put back the char into the in-stream */
 %option noinput
-    /* enable location */
+    /* enable location, used to the the next char from the in-stream */
 %option bison-bridge
 %option bison-locations
+    /* 启用与 Bison 的桥接功能, 并支持位置（行号和列号）的跟踪. 这对于错误报告和调试非常有用 */
 
 %{
+
+// %{ ... %}: 包含在这对大括号中的内容会被直接复制到生成的词法分析器的头文件中, 通常用于包含必要的头文件和定义辅助宏.
+
 #include "ast.h"
 #include "yacc.tab.h"
 #include <iostream>
 
 // automatically update location
 #define YY_USER_ACTION \
-    yylloc->first_line = yylloc->last_line; \
+    yylloc->first_line = yylloc->last_line; /* init another line, col */ \
     yylloc->first_column = yylloc->last_column; \
     for (int i = 0; yytext[i] != '\0'; i++) { \
         if(yytext[i] == '\n') { \
@@ -46,8 +50,8 @@ single_op ";"|"("|")"|","|"*"|"="|">"|"<"|"."
 %%
     /* block comment */
 "/*" { BEGIN(STATE_COMMENT); }
-<STATE_COMMENT>"*/" { BEGIN(INITIAL); }
-<STATE_COMMENT>[^*] { /* ignore the text of the comment */ }
+<STATE_COMMENT>"*/" { BEGIN(INITIAL); } 
+<STATE_COMMENT>[^*] { /* ignore the text of the comment, other line should begin with * */ }
 <STATE_COMMENT>\* { /* ignore *'s that aren't part of */ }
     /* single line comment */
 "--".* { /* ignore single line comment */ }
