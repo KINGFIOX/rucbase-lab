@@ -10,8 +10,6 @@ See the Mulan PSL v2 for more details. */
 
 #pragma once
 
-#include "defs.h"
-
 int yyparse();
 
 typedef struct yy_buffer_state *YY_BUFFER_STATE;

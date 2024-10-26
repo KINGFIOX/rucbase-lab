@@ -4,6 +4,7 @@
 #include <iostream>
 #include <memory>
 
+// YYSTYPE: asm::SemValue
 int yylex(YYSTYPE *yylval, YYLTYPE *yylloc);
 
 void yyerror(YYLTYPE *locp, const char* s) {
@@ -73,7 +74,7 @@ start:
         parse_tree = nullptr;
         YYACCEPT;
     }
-    ;
+    ; /* this semicolon means the end of a production */
 
 stmt:
         dbStmt
@@ -136,7 +137,7 @@ dml:
     {
         $$ = std::make_shared<InsertStmt>($3, $6);
     }
-    |   DELETE FROM tbName optWhereClause
+    |   DELETE FROM tbName optWhereClause /* opt: means option of the where_clause */
     {
         $$ = std::make_shared<DeleteStmt>($3, $4);
     }
