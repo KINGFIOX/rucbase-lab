@@ -1,4 +1,4 @@
-# Rucbase使用指南
+# Rucbase 使用指南
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -8,7 +8,7 @@
 
 - [环境配置](#%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE)
 - [项目下载](#%E9%A1%B9%E7%9B%AE%E4%B8%8B%E8%BD%BD)
-  - [GoogleTest子模块安装](#googletest%E5%AD%90%E6%A8%A1%E5%9D%97%E5%AE%89%E8%A3%85)
+  - [GoogleTest 子模块安装](#googletest%E5%AD%90%E6%A8%A1%E5%9D%97%E5%AE%89%E8%A3%85)
 - [编译](#%E7%BC%96%E8%AF%91)
 - [运行 (S/C)](#%E8%BF%90%E8%A1%8C-sc)
 - [测试单元](#%E6%B5%8B%E8%AF%95%E5%8D%95%E5%85%83)
@@ -20,15 +20,15 @@
 
 ## 环境配置
 
-Rucbase需要以下依赖环境库配置：
+Rucbase 需要以下依赖环境库配置：
 
-- gcc 7.1及以上版本（要求完全支持C++17）
-- cmake 3.16及以上版本
+- gcc 7.1 及以上版本（要求完全支持 C++17）
+- cmake 3.16 及以上版本
 - flex
 - bison
 - readline
 
-可以通过命令完成环境配置(以Debian/Ubuntu-apt为例)
+可以通过命令完成环境配置(以 Debian/Ubuntu-apt 为例)
 
 ```bash
 sudo apt-get install build-essential  # build-essential packages, including gcc, g++, make and so on
@@ -37,13 +37,13 @@ sudo apt-get install flex bison       # flex & bison packages
 sudo apt-get install libreadline-dev  # readline package
 ```
 
-可以通过`cmake --version`命令来查看cmake版本，如果低于3.16，需要在官网下载3.16以上的版本并解压，手动进行安装。
+可以通过`cmake --version`命令来查看 cmake 版本，如果低于 3.16，需要在官网下载 3.16 以上的版本并解压，手动进行安装。
 
-注意,在CentOS下,编译时可能存在头文件冲突的问题,我们不建议你使用Ubuntu以外的操作系统,你可以向助教获取帮助
+注意,在 CentOS 下,编译时可能存在头文件冲突的问题,我们不建议你使用 Ubuntu 以外的操作系统,你可以向助教获取帮助
 
 ## 项目下载
 
-你可以通过以下两种方式来完成Rucbase及其子模块的下载
+你可以通过以下两种方式来完成 Rucbase 及其子模块的下载
 
 ```bash
 git clone --recursive https://github.com/ruc-deke/rucbase-lab.git
@@ -58,11 +58,11 @@ git submodule init
 git submodule update //clone submodules
 ```
 
-**注意，当新lab放出时，你需要先使用git pull命令拉取最新的实验文档**
+**注意，当新 lab 放出时，你需要先使用 git pull 命令拉取最新的实验文档**
 
-### GoogleTest子模块安装
+### GoogleTest 子模块安装
 
-当本项目及子模块下载成功之后，你需要进行GoogleTest子模块的安装，具体命令如下：
+当本项目及子模块下载成功之后，你需要进行 GoogleTest 子模块的安装，具体命令如下：
 
 ```bash
 cd deps
@@ -80,7 +80,7 @@ sudo make install
 
 ```bash
 mkdir build
-cd build 
+cd build
 cmake .. [-DCMAKE_BUILD_TYPE=Debug]|[-DCMAKE_BUILD_TYPE=Release]
 make rmdb <-j4>|<-j8> # 选择4 or 8线程编译，如果你不想选择，那么make -j也是可以的
 ```
@@ -92,7 +92,7 @@ cd rucbase_client
 mkdir build
 cd build
 cmake .. [-DCMAKE_BUILD_TYPE=Debug]|[-DCMAKE_BUILD_TYPE=Release]
-make <-j4>|<-j8> # 选择4 or 8线程编译 
+make <-j4>|<-j8> # 选择4 or 8线程编译
 ```
 
 ## 运行 (S/C)
@@ -111,53 +111,52 @@ cd rucbase_client/build
 ./rucbase_client
 ```
 
-用户可以通过在客户端界面使用exit命令来进行客户端的关闭：
+用户可以通过在客户端界面使用 exit 命令来进行客户端的关闭：
 
 ```bash
 Rucbase> exit;
 ```
 
-服务端的关闭需要在服务端运行界面使用ctrl+c来进行关闭，关闭服务端时，系统会把数据页刷新到磁盘中。
+服务端的关闭需要在服务端运行界面使用 ctrl+c 来进行关闭，关闭服务端时，系统会把数据页刷新到磁盘中。
 
-+ 如果需要删除数据库，则需要在build文件夹下删除与数据库同名的目录
-+ 如果需要删除某个数据库中的表文件，则需要在build文件夹下找到数据库同名目录，进入该目录，然后删除表文件
+- 如果需要删除数据库，则需要在 build 文件夹下删除与数据库同名的目录
+- 如果需要删除某个数据库中的表文件，则需要在 build 文件夹下找到数据库同名目录，进入该目录，然后删除表文件
 
 ## 测试单元
 
-GoogleTest框架测试
+GoogleTest 框架测试
 
 包含以下模块测试：
 
 - 存储模块：
 
   - disk_manager_test
-  
+
   - lru_replacer_test
-    
   - buffer_pool_manager_test
-  
+
   - record_manager_test
 
 - 索引模块：
-  
+
   - b_plus_tree_insert_test
   - b_plus_tree_delete_test
   - b_plus_tree_concurrent_test
 
 - 执行模块：
-  
+
   - task1_test.sh
   - task2_test.sh
   - task3_test.sh
   - taskall_test.sh
 
 - 事务模块：
-  
+
   - txn_test
   - lock_test
   - concurrency_test
 
-以lru_replacer_test为例，可以通过以下命令进行测试：
+以 lru_replacer_test 为例，可以通过以下命令进行测试：
 
 ```bash
 cd build
@@ -169,7 +168,7 @@ make lru_replacer_test
 
 ### SQL Example
 
-目前系统支持基础DML和DDL语句，包括以下语句：
+目前系统支持基础 DML(manipulate) 和 DDL(define) 语句，包括以下语句：
 
 - create/drop table;
 - create/drop index;
@@ -179,9 +178,9 @@ make lru_replacer_test
 - begin;
 - commit/abort;
 
-目前事务的并发控制暂时支持可重复读隔离级别，事务暂时只支持基础insert、delete、update和select操作。
+目前事务的并发控制暂时支持可重复读隔离级别，事务暂时只支持基础 insert、delete、update 和 select 操作。
 
-以下为SQL操作demo，具体下SQL语法可以在系统中使用help语句查询：
+以下为 SQL 操作 demo，具体下 SQL 语法可以在系统中使用 help 语句查询：
 
 ```sql
 create table student (id int, name char(32), major char(32));

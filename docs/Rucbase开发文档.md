@@ -1,9 +1,9 @@
-# Rucbase开发文档
+# Rucbase 开发文档
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
-- [flex && bison文件的修改](#flex--bison%E6%96%87%E4%BB%B6%E7%9A%84%E4%BF%AE%E6%94%B9)
+- [flex && bison 文件的修改](#flex--bison%E6%96%87%E4%BB%B6%E7%9A%84%E4%BF%AE%E6%94%B9)
 - [代码规范](#%E4%BB%A3%E7%A0%81%E8%A7%84%E8%8C%83)
 - [注释规范](#%E6%B3%A8%E9%87%8A%E8%A7%84%E8%8C%83)
   - [example](#example)
@@ -11,26 +11,30 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-## flex && bison文件的修改
-在parser子文件夹下涉及flex和bison文件的修改，开发者修改lex.l和yacc.y文件之后，需要通过以下命令重新生成对应文件：
+## flex && bison 文件的修改
+
+在 parser 子文件夹下涉及 flex 和 bison 文件的修改，开发者修改 lex.l 和 yacc.y 文件之后，需要通过以下命令重新生成对应文件：
+
 ```bash
 flex --header-file=lex.yy.hpp -o lex.yy.cpp lex.l
 bison --defines=yacc.tab.hpp -o yacc.tab.cpp yacc.y
 ```
 
 ## 代码规范
-> 以VScode format配置为例
+
+> 以 VScode format 配置为例
 
 ```
-{ 
-    BasedOnStyle: Google, 
+{
+    BasedOnStyle: Google,
     IndentWidth: 4,
-    TabWidth: 4, 
+    TabWidth: 4,
     ColumnLimit: 120
 }
 ```
 
 ## 注释规范
+
 使用`/** */`写注释块
 
 使用`//` 写行内注释
@@ -39,6 +43,7 @@ bison --defines=yacc.tab.hpp -o yacc.tab.cpp yacc.y
 
 尽量不要使用中文标点符号
 注释块符号
+
 ```
 @brief: 简要描述
 @param: 参数描述
@@ -46,7 +51,9 @@ bison --defines=yacc.tab.hpp -o yacc.tab.cpp yacc.y
 @note: 注意点
 @see: 用它来指明其他相关的 method 或 function . 你可以使用多个这种标签.
 ```
+
 ### example
+
 ```cpp
 
 /**
@@ -58,13 +65,14 @@ bison --defines=yacc.tab.hpp -o yacc.tab.cpp yacc.y
 */
 bool init(int dynamParam,int controlPrarm){
     //*/
-        codeSegement1;  
+        codeSegement1;
     /*/
-        codeSegement2;  
+        codeSegement2;
     //*/
 }
 
 ```
 
 ## 相关资料
-[GoogleTest框架简介](https://www.cnblogs.com/jycboy/p/6057677.html)
+
+[GoogleTest 框架简介](https://www.cnblogs.com/jycboy/p/6057677.html)

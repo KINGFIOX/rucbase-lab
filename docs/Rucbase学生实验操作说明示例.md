@@ -14,9 +14,9 @@
 
 > 本文档将以实验一（存储管理实验）部分任务为例示范你应该如何完成一个实验任务，并进行自我测试和提交
 
-根据[Rucbase-Lab1存储管理实验文档](Rucbase-Lab1[存储管理实验文档].md)查看相应任务，进入`rucbase`项目对应的代码目录，你将看到实验文档中说明的需要你本人完成的项目源码`.cpp/.h`文件，除此之外，你还可能看到类似`*_test.cpp/*_test.sh`的文件，其中`*_test.cpp`文件是`GoogleTest`测试源码文件，而`.sh`文件则是在其他实验中使用的非`GoogleTest`测试脚本，你会在对应实验发布时获得相应的说明文件。
+根据[Rucbase-Lab1 存储管理实验文档](Rucbase-Lab1[存储管理实验文档].md)查看相应任务，进入`rucbase`项目对应的代码目录，你将看到实验文档中说明的需要你本人完成的项目源码`.cpp/.h`文件，除此之外，你还可能看到类似`*_test.cpp/*_test.sh`的文件，其中`*_test.cpp`文件是`GoogleTest`测试源码文件，而`.sh`文件则是在其他实验中使用的非`GoogleTest`测试脚本，你会在对应实验发布时获得相应的说明文件。
 
-在阅读本指南前，请确保自己已经按照[Rucbase环境配置文档](Rucbase环境配置文档.md)配置好了环境，并根据[Rucbase使用文档](Rucbase使用文档.md)创建好了`build`目录，测试了`cmake`工具
+在阅读本指南前，请确保自己已经按照[Rucbase 环境配置文档](Rucbase环境配置文档.md)配置好了环境，并根据[Rucbase 使用文档](Rucbase使用文档.md)创建好了`build`目录，测试了`cmake`工具
 
 ## 补全代码
 
@@ -35,7 +35,7 @@ Mode                 LastWriteTime         Length Name
 -a----         2022/9/18     10:07           1021 replacer.h
 ```
 
-为完成本任务，你需要完成[Rucbase-Lab1存储管理实验文档](Rucbase-Lab1[存储管理实验文档].md)中指出的`Replacer`类相应接口，其中必做任务是LRU策略，你需要打开`lru_replacer.cpp`，在源码文件中，对于每个你需要实现的接口方法进行了功能描述和实现提示，示例如下：
+为完成本任务，你需要完成[Rucbase-Lab1 存储管理实验文档](Rucbase-Lab1[存储管理实验文档].md)中指出的`Replacer`类相应接口，其中必做任务是 LRU 策略，你需要打开`lru_replacer.cpp`，在源码文件中，对于每个你需要实现的接口方法进行了功能描述和实现提示，示例如下：
 
 ```cpp
 /**
@@ -69,9 +69,7 @@ size_t max_size_;  // 最大容量（与缓冲池的容量相同）
 
 你也可以自行修改或添加，只要最后正确实现功能即可。**但是，强烈建议你不要擅自修改每个接口的声明**
 
-当你完成LRU策略后，你也可以自行考虑是否实现CLOCK策略，整个实现步骤与LRU任务类似。
-
-
+当你完成 LRU 策略后，你也可以自行考虑是否实现 CLOCK 策略，整个实现步骤与 LRU 任务类似。
 
 ## 自我测试
 
@@ -94,7 +92,7 @@ make lru_replacer_test
 如果测试通过，你得到的输出应该类似于
 
 ```
-aaron@DESKTOP-U1TJ26P:~/rucdeke/rucbase-lab/build$ ./bin/lru_replacer_test 
+aaron@DESKTOP-U1TJ26P:~/rucdeke/rucbase-lab/build$ ./bin/lru_replacer_test
 Running main() from /home/aaron/rucdeke/rucbase-lab/deps/googletest/googletest/src/gtest_main.cc
 [==========] Running 6 tests from 1 test suite.
 [----------] Global test environment set-up.
@@ -165,4 +163,3 @@ Scanning dependencies of target lru_replacer
 我们鼓励你使用`Github`或者`Gitee`的私有仓库功能，建立自己的远程代码库进行代码与报告提交，并将助教账户添加为你们仓库的协作者或者赋予访问权限。助教会定期拉取你们的仓库代码进行测试，并将测试结果贴在仓库的`issues`中。
 
 你们也可以使用压缩包的方式将自己对应实验更改的代码文件以及相关报告发送到助教邮箱或者其他系统中，请根据个人喜好选择提交方式。
-
