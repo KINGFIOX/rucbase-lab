@@ -36,16 +36,19 @@ int main() {
   };
   for (auto &sql : sqls) {
     std::cout << sql << std::endl;
+    // 启动语法分析过程, 根据 bison 定义的语法规则解析输入, 返回 buf
     YY_BUFFER_STATE buf = yy_scan_string(sql.c_str());
     assert(yyparse() == 0);
     if (ast::parse_tree != nullptr) {
+      // parse_tree 是一个全局变量, src/parser/ast.cpp 中定义, yacc.y
       ast::TreePrinter::print(ast::parse_tree);
+      // 释放 buf, 释放资源
       yy_delete_buffer(buf);
-      std::cout << std::endl;
+      std::cout << std::endl;  // newline and flush
     } else {
       std::cout << "exit/EOF" << std::endl;
     }
   }
-  ast::parse_tree.reset();
+  ast::parse_tree.reset();  // descries the refcnt
   return 0;
 }
