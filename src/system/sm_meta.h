@@ -158,6 +158,8 @@ struct TabMeta {
 class DbMeta {
   friend class SmManager;
 
+  // 对于一个类的默认构造, 他会递归的调用他的成员的默认构造
+
  private:
   std::string name_;                     // 数据库名称
   std::map<std::string, TabMeta> tabs_;  // 数据库中包含的表

@@ -46,8 +46,8 @@ void SmManager::create_db(const std::string& db_name) {
     throw UnixError();
   }
   // 创建系统目录
-  DbMeta* new_db = new DbMeta();
-  new_db->name_ = db_name;
+  DbMeta* new_db = new DbMeta();  // default constructor
+  new_db->name_ = db_name;        // Copy
 
   // 注意，此处ofstream会在当前目录创建(如果没有此文件先创建)和打开一个名为DB_META_NAME的文件
   std::ofstream ofs(DB_META_NAME);
@@ -106,7 +106,7 @@ void SmManager::close_db() {}
  */
 void SmManager::show_tables(Context* context) {
   std::fstream outfile;
-  outfile.open("output.txt", std::ios::out | std::ios::app);
+  outfile.open("output.txt", std::ios::out | std::ios::app /*seek to end before each write, 就是写字*/);
   outfile << "| Tables |\n";
   RecordPrinter printer(1);
   printer.print_separator(context);
