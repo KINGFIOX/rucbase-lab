@@ -28,10 +28,15 @@ class RecordPrinter {
  public:
   RecordPrinter(size_t num_cols_) : num_cols(num_cols_) { assert(num_cols_ > 0); }
 
+  /**
+   * @brief 分隔符: +------+------+
+   *
+   * @param context
+   */
   void print_separator(Context *context) const {
     for (size_t i = 0; i < num_cols; i++) {
       // std::cout << '+' << std::string(COL_WIDTH + 2, '-');
-      std::string str = "+" + std::string(COL_WIDTH + 2, '-');
+      std::string str = "+" + std::string(COL_WIDTH + 2, '-');  // 打印分隔符
       if (context->ellipsis_ == false && *context->offset_ + RECORD_COUNT_LENGTH + str.length() < BUFFER_LENGTH) {
         memcpy(context->data_send_ + *(context->offset_), str.c_str(), str.length());
         *(context->offset_) = *(context->offset_) + str.length();
