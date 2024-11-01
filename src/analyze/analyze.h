@@ -22,7 +22,8 @@ See the Mulan PSL v2 for more details. */
 
 class Query {
  public:
-  std::shared_ptr<ast::TreeNode> parse;  // 可以区分是什么类型的语句
+  // 可以区分是什么类型的语句, 如 create table, drop table, select, insert, update, delete, begin, commit, abort
+  std::shared_ptr<ast::TreeNode> parse;
   // TODO jointree
   // where条件
   std::vector<Condition> conds;

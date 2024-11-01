@@ -22,31 +22,43 @@ See the Mulan PSL v2 for more details. */
 #include "index/ix.h"
 #include "record_printer.h"
 
-// 目前的索引匹配规则为：完全匹配索引字段，且全部为单点查询，不会自动调整where条件的顺序
-bool Planner::get_index_cols(std::string tab_name, std::vector<Condition> curr_conds, std::vector<std::string> &index_col_names) {
+/**
+ * @brief 目前的索引匹配规则为：完全匹配索引字段, 且全部为单点查询, 不会自动调整 where 条件的顺序
+ *
+ * @param tab_name
+ * @param curr_conds
+ * @param index_col_names (return)
+ * @return true
+ * @return false
+ */
+bool Planner::get_index_cols(const std::string &tab_name, const std::vector<Condition> curr_conds, std::vector<std::string> &index_col_names) {
   index_col_names.clear();
   for (auto &cond : curr_conds) {
-    if (cond.is_rhs_val && cond.op == OP_EQ && cond.lhs_col.tab_name.compare(tab_name) == 0) index_col_names.push_back(cond.lhs_col.col_name);
+    // 条件为单点查询, 也就是 rhs 为常量, 且 lhs 的表名与目标表名相同
+    if (cond.is_rhs_val && cond.op == OP_EQ && cond.lhs_col.tab_name.compare(tab_name) == 0) index_col_names.push_back(cond.lhs_col.col_name /*Copy*/);
   }
   TabMeta &tab = sm_manager_->db_.get_table(tab_name);
-  if (tab.is_index(index_col_names)) return true;
+  if (tab.is_index(index_col_names)) return true;  // 要查询的这些列是否有 index, 并且 cols.size() == index.cols.size()
   return false;
 }
 
 /**
- * @brief 表算子条件谓词生成
+ * @brief 表算子条件谓词生成.
  *
- * @param conds 条件
- * @param tab_names 表名
+ * @param conds
+ * @param tab_names
  * @return std::vector<Condition>
  */
-std::vector<Condition> pop_conds(std::vector<Condition> &conds, std::string tab_names) {
+static std::vector<Condition> pop_conds(std::vector<Condition> &conds, const std::string &tab_names) {
   // auto has_tab = [&](const std::string &tab_name) {
   //     return std::find(tab_names.begin(), tab_names.end(), tab_name) != tab_names.end();
   // };
   std::vector<Condition> solved_conds;
   auto it = conds.begin();
   while (it != conds.end()) {
+    // 1. 单点查询
+    // 2. cond 左右 table_name 相同
+    // 则从 conds -> solved_conds, 集合的转移
     if ((tab_names.compare(it->lhs_col.tab_name) == 0 && it->is_rhs_val) || (it->lhs_col.tab_name.compare(it->rhs_col.tab_name) == 0)) {
       solved_conds.emplace_back(std::move(*it));
       it = conds.erase(it);
@@ -57,7 +69,17 @@ std::vector<Condition> pop_conds(std::vector<Condition> &conds, std::string tab_
   return solved_conds;
 }
 
-int push_conds(Condition *cond, std::shared_ptr<Plan> plan) {
+/**
+ * @brief
+ *
+ * @param cond
+ * @param plan
+ * @return 0 neither side of the cond matches the plan
+ * @return 1 cond matches the plan's left
+ * @return 2 cond matches the plan's right
+ * @return 3 cond matches the plan's both sides
+ */
+static int push_conds(Condition *cond, std::shared_ptr<Plan> plan) {
   if (auto x = std::dynamic_pointer_cast<ScanPlan>(plan)) {
     if (x->tab_name_.compare(cond->lhs_col.tab_name) == 0) {
       return 1;
@@ -84,7 +106,7 @@ int push_conds(Condition *cond, std::shared_ptr<Plan> plan) {
     // 左子节点匹配到条件的右边
     if (left_res == 2) {
       // 需要将左右两边的条件变换位置
-      std::map<CompOp, CompOp> swap_op = {
+      static const std::map<CompOp, CompOp> swap_op = {
           {OP_EQ, OP_EQ}, {OP_NE, OP_NE}, {OP_LT, OP_GT}, {OP_GT, OP_LT}, {OP_LE, OP_GE}, {OP_GE, OP_LE},
       };
       std::swap(cond->lhs_col, cond->rhs_col);
@@ -93,7 +115,7 @@ int push_conds(Condition *cond, std::shared_ptr<Plan> plan) {
     x->conds_.emplace_back(std::move(*cond));
     return 3;
   }
-  return false;
+  return 0;
 }
 
 std::shared_ptr<Plan> pop_scan(int *scantbl, std::string table, std::vector<std::string> &joined_tables, std::vector<std::shared_ptr<Plan>> plans) {
@@ -261,11 +283,20 @@ std::shared_ptr<Plan> Planner::generate_select_plan(std::shared_ptr<Query> query
   return plannerRoot;
 }
 
-// 生成DDL语句和DML语句的查询执行计划
+/**
+ * @brief 生成 DDL 语句和 DML 语句的查询执行计划
+ *
+ * @param query
+ * @param context
+ * @return std::shared_ptr<Plan>
+ *
+ * @throws InternalError("Unexpected AST root")
+ * @throws
+ */
 std::shared_ptr<Plan> Planner::do_planner(std::shared_ptr<Query> query, Context *context) {
   std::shared_ptr<Plan> plannerRoot;
   if (auto x = std::dynamic_pointer_cast<ast::CreateTable>(query->parse)) {
-    // create table;
+    // create table grade (course char(32), student_id int, score float);
     std::vector<ColDef> col_defs;
     for (auto &field : x->fields) {
       if (auto sv_col_def = std::dynamic_pointer_cast<ast::ColDef>(field)) {
@@ -286,10 +317,10 @@ std::shared_ptr<Plan> Planner::do_planner(std::shared_ptr<Query> query, Context 
     // drop index
     plannerRoot = std::make_shared<DDLPlan>(T_DropIndex, x->tab_name, x->col_names, std::vector<ColDef>());
   } else if (auto x = std::dynamic_pointer_cast<ast::InsertStmt>(query->parse)) {
-    // insert;
+    // insert into student values (1, 'Tom', 'Computer Science');
     plannerRoot = std::make_shared<DMLPlan>(T_Insert, std::shared_ptr<Plan>(), x->tab_name, query->values, std::vector<Condition>(), std::vector<SetClause>());
   } else if (auto x = std::dynamic_pointer_cast<ast::DeleteStmt>(query->parse)) {
-    // delete;
+    // delete from student where id = 1;
     // 生成表扫描方式
     std::shared_ptr<Plan> table_scan_executors;
     // 只有一张表，不需要进行物理优化了

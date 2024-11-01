@@ -31,20 +31,21 @@ See the Mulan PSL v2 for more details. */
 static bool should_exit = false;
 
 // 构建全局所需的管理器对象
-auto disk_manager = std::make_unique<DiskManager>();
-auto buffer_pool_manager = std::make_unique<BufferPoolManager>(BUFFER_POOL_SIZE, disk_manager.get());
-auto rm_manager = std::make_unique<RmManager>(disk_manager.get(), buffer_pool_manager.get());
-auto ix_manager = std::make_unique<IxManager>(disk_manager.get(), buffer_pool_manager.get());
-auto sm_manager = std::make_unique<SmManager>(disk_manager.get(), buffer_pool_manager.get(), rm_manager.get(), ix_manager.get());
-auto lock_manager = std::make_unique<LockManager>();
-auto txn_manager = std::make_unique<TransactionManager>(lock_manager.get(), sm_manager.get());
-auto ql_manager = std::make_unique<QlManager>(sm_manager.get(), txn_manager.get());
-auto log_manager = std::make_unique<LogManager>(disk_manager.get());
-auto recovery = std::make_unique<RecoveryManager>(disk_manager.get(), buffer_pool_manager.get(), sm_manager.get());
-auto planner = std::make_unique<Planner>(sm_manager.get());
-auto optimizer = std::make_unique<Optimizer>(sm_manager.get(), planner.get());
-auto portal = std::make_unique<Portal>(sm_manager.get());
-auto analyze = std::make_unique<Analyze>(sm_manager.get());
+static inline auto disk_manager = std::make_unique<DiskManager>();
+static inline auto buffer_pool_manager = std::make_unique<BufferPoolManager>(BUFFER_POOL_SIZE, disk_manager.get());
+static inline auto rm_manager = std::make_unique<RmManager>(disk_manager.get(), buffer_pool_manager.get());
+static inline auto ix_manager = std::make_unique<IxManager>(disk_manager.get(), buffer_pool_manager.get());
+static inline auto sm_manager = std::make_unique<SmManager>(disk_manager.get(), buffer_pool_manager.get(), rm_manager.get(), ix_manager.get());
+static inline auto lock_manager = std::make_unique<LockManager>();
+static inline auto txn_manager = std::make_unique<TransactionManager>(lock_manager.get(), sm_manager.get());
+static inline auto ql_manager = std::make_unique<QlManager>(sm_manager.get(), txn_manager.get());
+static inline auto log_manager = std::make_unique<LogManager>(disk_manager.get());
+static inline auto recovery = std::make_unique<RecoveryManager>(disk_manager.get(), buffer_pool_manager.get(), sm_manager.get());
+static inline auto planner = std::make_unique<Planner>(sm_manager.get());
+static inline auto optimizer = std::make_unique<Optimizer>(sm_manager.get(), planner.get());
+static inline auto portal = std::make_unique<Portal>(sm_manager.get());
+static inline auto analyze = std::make_unique<Analyze>(sm_manager.get());
+
 pthread_mutex_t *buffer_mutex;
 pthread_mutex_t *sockfd_mutex;
 
@@ -125,9 +126,9 @@ void *client_handler(void *sock_fd) {
         try {
           // analyze and rewrite
           std::shared_ptr<Query> query = analyze->do_analyze(ast::parse_tree);
-          yy_delete_buffer(buf);
+          yy_delete_buffer(buf);  // 解析完了, 删除buf
           finish_analyze = true;
-          pthread_mutex_unlock(buffer_mutex);
+          pthread_mutex_unlock(buffer_mutex);  // 因为 buf 是一个全局变量, 上面用完了, 解锁
           // 优化器
           std::shared_ptr<Plan> plan = optimizer->plan_query(query, context);
           // portal

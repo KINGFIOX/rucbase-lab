@@ -39,6 +39,8 @@ struct PortalStmt {
       : tag(tag_), sel_cols(std::move(sel_cols_)), root(std::move(root_)), plan(std::move(plan_)) {}
 };
 
+// portal means: 入口
+
 class Portal {
  private:
   SmManager *sm_manager_;
@@ -48,7 +50,7 @@ class Portal {
   ~Portal() {}
 
   // 将查询执行计划转换成对应的算子树
-  std::shared_ptr<PortalStmt> start(std::shared_ptr<Plan> plan, Context *context) {
+  std::shared_ptr<PortalStmt> start(std::shared_ptr<Plan> plan, Context *context) const {
     // 这里可以将select进行拆分，例如：一个select，带有return的select等
     if (auto x = std::dynamic_pointer_cast<OtherPlan>(plan)) {
       return std::make_shared<PortalStmt>(PORTAL_CMD_UTILITY, std::vector<TabCol>(), std::unique_ptr<AbstractExecutor>(), plan);
@@ -57,14 +59,16 @@ class Portal {
     } else if (auto x = std::dynamic_pointer_cast<DMLPlan>(plan)) {
       switch (x->tag) {
         case T_select: {
+          // select 是投影
           std::shared_ptr<ProjectionPlan> p = std::dynamic_pointer_cast<ProjectionPlan>(x->subplan_);
           std::unique_ptr<AbstractExecutor> root = convert_plan_executor(p, context);
           return std::make_shared<PortalStmt>(PORTAL_ONE_SELECT, std::move(p->sel_cols_), std::move(root), plan);
         }
 
         case T_Update: {
+          // scan 是从数据源读取数据
           std::unique_ptr<AbstractExecutor> scan = convert_plan_executor(x->subplan_, context);
-          std::vector<Rid> rids;
+          std::vector<Rid> rids;  // record id
           for (scan->beginTuple(); !scan->is_end(); scan->nextTuple()) {
             rids.push_back(scan->rid());
           }
@@ -99,7 +103,16 @@ class Portal {
     return nullptr;
   }
 
-  // 遍历算子树并执行算子生成执行结果
+  /**
+   * @brief 遍历算子树并执行算子生成执行结果
+   *
+   * @param portal
+   * @param ql
+   * @param txn_id
+   * @param context
+   *
+   * @throw InternalError
+   */
   void run(std::shared_ptr<PortalStmt> portal, QlManager *ql, txn_id_t *txn_id, Context *context) {
     switch (portal->tag) {
       case PORTAL_ONE_SELECT: {
@@ -108,6 +121,7 @@ class Portal {
       }
 
       case PORTAL_DML_WITHOUT_SELECT: {
+        // 这里要 std::move, 是因为 portal->root 是 unique_ptr. unique_ptr 的构造函数只接受右值
         ql->run_dml(std::move(portal->root));
         break;
       }
@@ -129,8 +143,9 @@ class Portal {
   void drop() {}
 
   // executor(算子)
-  std::unique_ptr<AbstractExecutor> convert_plan_executor(std::shared_ptr<Plan> plan, Context *context) {
+  std::unique_ptr<AbstractExecutor> convert_plan_executor(std::shared_ptr<Plan> plan, Context *context) const {
     if (auto x = std::dynamic_pointer_cast<ProjectionPlan>(plan)) {
+      // 有点链表的意思. Projection: 投影
       return std::make_unique<ProjectionExecutor>(convert_plan_executor(x->subplan_, context), x->sel_cols_);
     } else if (auto x = std::dynamic_pointer_cast<ScanPlan>(plan)) {
       if (x->tag == T_SeqScan) {

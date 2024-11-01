@@ -21,6 +21,16 @@ See the Mulan PSL v2 for more details. */
 #include "system/sm.h"
 #include "transaction/transaction_manager.h"
 
+//! # 查询执行计划 (Query Execution Plan)
+//! 执行计划是数据库系统在接收到查询（如 SQL 语句）后，如何有效地执行该查询的一系列步骤的详细描述。它包括以下几个主要阶段：
+//! 1. 解析（Parsing）：将查询语句解析为内部表示形式，如抽象语法树（AST）。
+//! 2. 优化（Optimization）：选择最优的查询执行策略，可能涉及选择合适的索引、确定连接顺序、决定访问路径等。
+//! 3. 生成计划（Plan Generation）：基于优化结果，生成一个具体的执行步骤序列。
+//! 4. 执行（Execution）：按照计划执行查询，检索或修改数据。
+//! # 命名为 Plan
+//! 是因为它代表了执行查询的“计划”。类似于项目管理中的计划，执行计划详细说明了完成任务所需的步骤和资源。
+//! 在数据库系统中，执行计划决定了如何高效地访问和操作数据，以满足查询需求
+
 class Optimizer {
  private:
   SmManager *sm_manager_;

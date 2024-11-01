@@ -64,7 +64,7 @@ std::shared_ptr<Query> Analyze::do_analyze(std::shared_ptr<ast::TreeNode> parse)
     get_clause(x->conds, query->conds);
     check_clause({x->tab_name}, query->conds);
   } else if (auto x = std::dynamic_pointer_cast<ast::InsertStmt>(parse)) {
-    // 处理insert 的values值
+    // 处理insert 的 values 值
     for (auto &sv_val : x->vals) {
       query->values.push_back(convert_sv_value(sv_val));
     }
