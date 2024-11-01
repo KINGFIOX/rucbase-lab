@@ -1,5 +1,9 @@
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
+# -Wextra extra warnings
+# -pedantic follow ANSI/ISO C++ standard strictly
+# add_compile_options(-Wall -Werror -Wno-unused-parameter -Wno-return-type -Wno-class-memaccess)
+
 add_subdirectory(analyze)
 add_subdirectory(record)
 add_subdirectory(index)
@@ -13,7 +17,6 @@ add_subdirectory(replacer)
 add_subdirectory(transaction)
 add_subdirectory(recovery)
 add_subdirectory(test)
-
 
 target_link_libraries(parser execution pthread)
 

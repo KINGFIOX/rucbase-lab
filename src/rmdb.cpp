@@ -71,14 +71,10 @@ void *client_handler(void *sock_fd) {
   pthread_mutex_unlock(sockfd_mutex);
 
   int i_recvBytes;
-  // 接收客户端发送的请求
-  char data_recv[BUFFER_LENGTH];
-  // 需要返回给客户端的结果
-  char *data_send = new char[BUFFER_LENGTH];
-  // 需要返回给客户端的结果的长度
-  int offset = 0;
-  // 记录客户端当前正在执行的事务ID
-  txn_id_t txn_id = INVALID_TXN_ID;
+  char data_recv[BUFFER_LENGTH];              // 接收客户端发送的请求
+  char *data_send = new char[BUFFER_LENGTH];  // 需要返回给客户端的结果
+  int offset = 0;                             // 需要返回给客户端的结果的长度
+  txn_id_t txn_id = INVALID_TXN_ID;           // 记录客户端当前正在执行的事务ID
 
   std::string output = "establish client connection, sockfd: " + std::to_string(fd) + "\n";
   std::cout << output;
@@ -122,7 +118,7 @@ void *client_handler(void *sock_fd) {
 
     // 用于判断是否已经调用了yy_delete_buffer来删除buf
     bool finish_analyze = false;
-    pthread_mutex_lock(buffer_mutex);
+    pthread_mutex_lock(buffer_mutex);  // lock, because of the global variable ast::parse_tree
     YY_BUFFER_STATE buf = yy_scan_string(data_recv);
     if (yyparse() == 0) {
       if (ast::parse_tree != nullptr) {
@@ -199,14 +195,13 @@ void start_server() {
   pthread_mutex_init(buffer_mutex, nullptr);
   pthread_mutex_init(sockfd_mutex, nullptr);
 
-  int sockfd_server;
-  int fd_temp;
   struct sockaddr_in s_addr_in {};
 
   // 初始化连接
-  sockfd_server = socket(AF_INET, SOCK_STREAM, 0);  // ipv4,TCP
+  int sockfd_server = socket(AF_INET, SOCK_STREAM, 0);  // ipv4,TCP
   assert(sockfd_server != -1);
   int val = 1;
+  // get and set options on sockets
   setsockopt(sockfd_server, SOL_SOCKET, SO_REUSEADDR, &val, sizeof(val));
 
   // before bind(), set the attr of structure sockaddr.
@@ -214,7 +209,7 @@ void start_server() {
   s_addr_in.sin_family = AF_INET;
   s_addr_in.sin_addr.s_addr = htonl(INADDR_ANY);
   s_addr_in.sin_port = htons(SOCK_PORT);
-  fd_temp = bind(sockfd_server, (struct sockaddr *)(&s_addr_in), sizeof(s_addr_in));
+  int fd_temp = bind(sockfd_server, (struct sockaddr *)(&s_addr_in), sizeof(s_addr_in));
   if (fd_temp == -1) {
     std::cout << "Bind error!" << std::endl;
     exit(1);
@@ -246,7 +241,7 @@ void start_server() {
     }
 
     // 和客户端建立连接，并开启一个线程负责处理客户端请求
-    if (pthread_create(&thread_id, nullptr, &client_handler, (void *)(&sockfd)) != 0) {
+    if (pthread_create(&thread_id, nullptr, &client_handler, (void *)(&sockfd)) != 0) {  // 开一个线程, 用于处理请求
       std::cout << "Create thread fail!" << std::endl;
       break;  // break while loop
     }

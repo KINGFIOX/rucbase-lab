@@ -84,7 +84,9 @@ void SmManager::drop_db(const std::string& db_name) {
  * @description: 打开数据库，找到数据库对应的文件夹，并加载数据库元数据和相关文件
  * @param {string&} db_name 数据库名称，与文件夹同名
  */
-void SmManager::open_db(const std::string& db_name) {}
+void SmManager::open_db(const std::string& db_name) {
+  //
+}
 
 /**
  * @description: 把数据库相关的元数据刷入磁盘中
