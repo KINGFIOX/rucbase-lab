@@ -140,7 +140,9 @@ class Portal {
   }
 
   // 清空资源
-  void drop() {}
+  void drop() {
+    // do nothing
+  }
 
   // executor(算子)
   std::unique_ptr<AbstractExecutor> convert_plan_executor(std::shared_ptr<Plan> plan, Context *context) const {

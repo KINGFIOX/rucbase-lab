@@ -118,18 +118,17 @@ void QlManager::run_cmd_utility(std::shared_ptr<Plan> plan, txn_id_t *txn_id, Co
 
 // 执行select语句，select语句的输出除了需要返回客户端外，还需要写入output.txt文件中
 void QlManager::select_from(std::unique_ptr<AbstractExecutor> executorTreeRoot, std::vector<TabCol> sel_cols, Context *context) {
-  std::vector<std::string> captions;  // 表头, 列名之类的
+  std::vector<std::string> captions;  // 表头, 列名之类的. 初始化表头
   captions.reserve(sel_cols.size());
   for (auto &sel_col : sel_cols) {
     captions.push_back(sel_col.col_name);
   }
 
-  // Print header into buffer
+  // Print header into buffer. 打印表头并写入文件
   RecordPrinter rec_printer(sel_cols.size());
   rec_printer.print_separator(context);
   rec_printer.print_record(captions, context);
   rec_printer.print_separator(context);
-  // print header into file
   std::fstream outfile;
   outfile.open("output.txt", std::ios::out | std::ios::app);
   outfile << "|";
@@ -138,11 +137,11 @@ void QlManager::select_from(std::unique_ptr<AbstractExecutor> executorTreeRoot, 
   }
   outfile << "\n";
 
-  // Print records
+  // Print records. 遍历并打印每一条记录
   size_t num_rec = 0;
   // 执行query_plan
-  for (executorTreeRoot->beginTuple(); !executorTreeRoot->is_end(); executorTreeRoot->nextTuple()) {
-    auto Tuple = executorTreeRoot->Next();  //
+  for (executorTreeRoot->beginTuple(); !executorTreeRoot->is_end(); executorTreeRoot->nextTuple()) {  // 使用执行器, 遍历每一条记录
+    auto Tuple = executorTreeRoot->Next();                                                            //
     std::vector<std::string> columns;
     for (auto &col : executorTreeRoot->cols()) {
       std::string col_str;

@@ -56,7 +56,7 @@ class RecordPrinter {
   void print_record(const std::vector<std::string> &rec_str, Context *context) const {
     assert(rec_str.size() == num_cols);
     for (auto col : rec_str) {
-      if (col.size() > COL_WIDTH) {
+      if (col.size() > COL_WIDTH) {  // 省略号
         col = col.substr(0, COL_WIDTH - 3) + "...";
       }
       // std::cout << "| " << std::setw(COL_WIDTH) << col << ' ';
